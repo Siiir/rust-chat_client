@@ -23,7 +23,7 @@ pub fn start_msg_fetching_deamon(
 
             // Perform query
             messages.last().map(|msg| msg.id() + 1).map(|future_msg_id| {
-                crate::pa::write_future_msg_id_throwing_ctx_err(future_msg_id).unwrap();
+                crate::pa::write::future_msg_id_throwing_ctx_err(future_msg_id).unwrap();
                 get_msgs_query.set_from_id(Some(future_msg_id));
             });
             match crate::req::get_msgs_with_ctx_err(&client, &get_msgs_query) {

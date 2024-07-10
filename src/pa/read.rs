@@ -1,4 +1,3 @@
-use core::panic;
 use std::{io, thread, time::Duration};
 
 use anyhow::Context;
@@ -24,7 +23,7 @@ pub fn future_msg_id() -> crate::MsgId {
             Ok(Ok(future_msg_id)) => break future_msg_id,
             Ok(anyhow::Result::Err(parse_err)) => {
                 tracing::warn!("Overwriting corrupted file {FPATH_TO_FUTURE_MSG_ID:?} with defaults, due to error during content parsing: {parse_err}");
-                if let Err(io_err) = crate::pa::write_future_msg_id_with_default_throwing_ctx_err()
+                if let Err(io_err) = crate::pa::write::default_future_msg_id_throwing_ctx_err()
                 {
                     panic!("Failed to fix (overwrite) corrupted storage. Error: {io_err}")
                 };
