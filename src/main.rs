@@ -2,23 +2,15 @@ use chat_client::model::{ChatMsg, GetMsgs};
 use reqwest::blocking::Client;
 
 fn main() -> anyhow::Result<()> {
-    // Inits
+    // Inits – basic
     chat_client::init::all();
-    let mut cli_args: chat_client::cli::Args = clap::Parser::parse();
-    if cli_args.from_id.is_none() {
-        let int = match fs_err::read(chat_client::pa::FPATH_TO_FUTURE_MSG_ID) {
-            Ok(read_bytes) => {
-                let mut arr = [0; 8];
-                for (idx, b) in read_bytes.into_iter().enumerate() {
-                    arr[idx] = b;
-                }
-                i64::from_le_bytes(arr)
-            }
-            Err(_) => 0,
-        };
-        cli_args.from_id = Some(int - 5);
-    }
-    let get_msgs_query: GetMsgs = (&cli_args).into();
+    let cli_args: chat_client::cli::Args = clap::Parser::parse();
+    let mut get_msgs_query: GetMsgs = (&cli_args).into();
+    // Inits – app state
+    if get_msgs_query.from_id().is_none() {
+        let int = chat_client::pa::read::future_msg_id();
+        get_msgs_query.set_from_id(Some(int - 5));
+    };
     let client = Client::new();
 
     // Fetching requested messages as the first automatic user action.
@@ -29,7 +21,7 @@ fn main() -> anyhow::Result<()> {
     if cli_args.to_id.is_none() {
         chat_client::start_msg_fetching_deamon(messages, client.clone());
     }
-
+    // Posting loop
     let mut msg_content = String::new();
     loop {
         std::io::stdin().read_line(&mut msg_content).unwrap();

@@ -22,17 +22,16 @@ pub fn start_msg_fetching_deamon(
             let start = chrono::Utc::now();
 
             // Perform query
-            messages.last().map(|msg| msg.id() + 1).map(|next_msg_id| {
-                fs_err::write(crate::pa::FPATH_TO_FUTURE_MSG_ID, next_msg_id.to_le_bytes())
-                    .unwrap();
-                get_msgs_query.set_from_id(Some(next_msg_id));
+            messages.last().map(|msg| msg.id() + 1).map(|future_msg_id| {
+                crate::pa::write_future_msg_id_throwing_ctx_err(future_msg_id).unwrap();
+                get_msgs_query.set_from_id(Some(future_msg_id));
             });
             match crate::req::get_msgs_with_ctx_err(&client, &get_msgs_query) {
                 Ok(msgs) => {
                     messages = msgs;
                     crate::ui::stdstreams::print_msgs(messages.iter());
                 }
-                Err(err) => tracing::error!("{err}"),
+                Err(err) => tracing::error!("{err:?}\n"),
             }
 
             // Calculate elapsed time and sleep for the remaining time to make it 1 second

@@ -14,5 +14,6 @@ fs-err = "2.11.0"
 reqwest = { version = "0.12.5", features = ["blocking", "json"] }
 serde = { version = "1.0.203", features = ["derive"] }
 serde_json = "1.0.118"
+tap = "1.0.1"
 tracing = "0.1.40"
 tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
