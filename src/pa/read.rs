@@ -36,8 +36,8 @@ pub fn future_msg_id() -> crate::MsgId {
                 }
                 is_second_attempt = true;
                 if io_err.kind() == io::ErrorKind::NotFound {
-                    if let Err(io_err) = crate::pa::init_future_msg_id() {
-                        panic!("{io_err}");
+                    if let Err(err) = crate::pa::init_future_msg_id() {
+                        panic!("{err:?}");
                     };
                 } else {
                     tracing::warn!("Can't read full integer from {FPATH_TO_FUTURE_MSG_ID:?}, reattempting after 1 sec. Error: {io_err}");
