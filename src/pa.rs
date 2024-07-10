@@ -14,6 +14,9 @@ pub fn init_future_msg_id() -> anyhow::Result<()> {
         .context("Failed to save initial value of `future message id` in persistent storage.")
 }
 fn create_new_future_msg_id() -> io::Result<()> {
+    if let Some(parent) = std::path::Path::new(FPATH_TO_FUTURE_MSG_ID).parent() {
+        fs_err::create_dir_all(parent)?;
+    }
     fs_err::OpenOptions::new()
         .create_new(true)
         .write(true)
