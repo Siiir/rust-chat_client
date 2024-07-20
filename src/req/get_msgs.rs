@@ -50,7 +50,7 @@ impl From<&crate::cli::Args> for GetMsgs {
         Self::new(
             Some(from_id.unwrap_or_else(|| {
                 let int = crate::pa::read::future_msg_id();
-                int - 5
+                int - 4
             })),
             to_id.clone(),
             from_time.clone(),

@@ -1,4 +1,4 @@
-//! PA – Persistance API
+//! # PA – Persistance API
 
 pub mod read;
 pub mod write;
