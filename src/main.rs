@@ -10,12 +10,12 @@ fn main() -> anyhow::Result<()> {
     let client = Client::new();
 
     // Fetching requested messages as the first automatic client action.
-    let messages = chat_client::pull_msgs(&client, get_msgs_query)?;
+    let messages = chat_client::app::pull_msgs(&client, get_msgs_query)?;
     // Starting message featching deamon
     if cli_args.to_id.is_none() {
-        chat_client::start_msg_fetching_thread(messages, client.clone());
+        chat_client::app::start_msg_fetching_thread(messages, client.clone());
     }
     // Posting loop
-    chat_client::msg_posting_loop(&client, &cli_args)
+    chat_client::app::msg_posting::run_loop(&client, &chat_client::MsgPoster::new(cli_args.nickname))
 }
 
