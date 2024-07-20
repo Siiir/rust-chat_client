@@ -48,7 +48,10 @@ impl From<&crate::cli::Args> for GetMsgs {
         } = args;
 
         Self::new(
-            from_id.clone(),
+            Some(from_id.unwrap_or_else(|| {
+                let int = crate::pa::read::future_msg_id();
+                int - 5
+            })),
             to_id.clone(),
             from_time.clone(),
             to_time.clone(),

@@ -1,10 +1,18 @@
+pub type ReqClient = reqwest::blocking::Client;
+
+pub use post_msg::PostMsg;
+pub mod post_msg;
+
+pub use get_msgs::GetMsgs;
+pub mod get_msgs;
+
 use std::io::Read;
 
 use anyhow::{anyhow, Context};
 
 pub fn get_msgs(
     client: &reqwest::blocking::Client,
-    get_msgs_query: &crate::model::GetMsgs,
+    get_msgs_query: &crate::req::GetMsgs,
 ) -> reqwest::Result<reqwest::blocking::Response> {
     client
         .get("http://localhost:8080/v1/msg")
@@ -13,7 +21,7 @@ pub fn get_msgs(
 }
 pub fn get_msgs_with_ctx_err(
     client: &reqwest::blocking::Client,
-    get_msgs_query: &crate::model::GetMsgs,
+    get_msgs_query: &crate::req::GetMsgs,
 ) -> anyhow::Result<Vec<crate::model::ChatMsg>> {
     (|| -> anyhow::Result<_> {
         let mut resp =
@@ -38,7 +46,7 @@ pub fn get_msgs_with_ctx_err(
 }
 pub fn post_msg(
     client: &reqwest::blocking::Client,
-    post_msg_query: &crate::model::PostMsg,
+    post_msg_query: &crate::req::PostMsg,
 ) -> reqwest::Result<reqwest::blocking::Response> {
     client
         .post("http://localhost:8080/v1/msg")
@@ -47,7 +55,7 @@ pub fn post_msg(
 }
 pub fn post_msg_with_ctx_err(
     client: &reqwest::blocking::Client,
-    post_msg_query: &crate::model::PostMsg,
+    post_msg_query: &crate::req::PostMsg,
 ) -> anyhow::Result<crate::model::ChatMsg> {
     (|| -> anyhow::Result<_> {
         let mut resp =
