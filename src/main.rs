@@ -11,10 +11,9 @@ fn main() -> anyhow::Result<()> {
 
     // Fetching requested messages as the first automatic client action.
     let messages = chat_client::pull_msgs(&client, get_msgs_query)?;
-
     // Starting message featching deamon
     if cli_args.to_id.is_none() {
-        chat_client::start_msg_fetching_deamon(messages, client.clone());
+        chat_client::start_msg_fetching_thread(messages, client.clone());
     }
     // Posting loop
     chat_client::msg_posting_loop(&client, &cli_args)

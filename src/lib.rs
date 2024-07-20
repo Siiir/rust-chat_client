@@ -39,7 +39,7 @@ pub fn msg_posting_loop(client: &ReqClient, cli_args: &crate::cli::Args) -> ! {
     }
 }
 
-pub fn start_msg_fetching_deamon(
+pub fn start_msg_fetching_thread(
     mut messages: Vec<model::ChatMsg>,
     client: reqwest::blocking::Client,
 ) -> std::thread::JoinHandle<impl Send + 'static> {
