@@ -21,6 +21,7 @@ pub fn start_msg_fetching_thread(
         loop {
             let start = time::Instant::now();
 
+            // Update `future_msg_id` dependants
             future_msg_id.map(|future_msg_id| {
                 crate::pa::write::future_msg_id_throwing_ctx_err(future_msg_id).unwrap();
                 get_msgs_query.set_from_id(Some(future_msg_id));
@@ -29,6 +30,7 @@ pub fn start_msg_fetching_thread(
             match crate::req::get_msgs_with_ctx_err(&client, &get_msgs_query) {
                 Ok(msgs) => {
                     crate::ui::stdstreams::print_msgs(msgs.iter());
+                    // Update [`future_msg_id`]
                     msgs.last()
                         .map(|last_msg| future_msg_id = Some(last_msg.id() + 1));
                 }
