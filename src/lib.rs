@@ -12,6 +12,7 @@ pub mod ui;
 
 pub mod util;
 
+pub use app::cfg::AppCfg;
 pub mod app;
 
 pub type MsgId = i64;

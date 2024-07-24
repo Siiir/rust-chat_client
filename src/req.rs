@@ -1,55 +1,16 @@
 pub type ReqClient = reqwest::blocking::Client;
 
-pub use post_msg::PostMsg;
+pub use post_msg::{PostMsg, post_msg};
 pub mod post_msg;
 
-pub use get_msgs::GetMsgs;
+pub use get_msgs::{GetMsgs, get_msgs};
 pub mod get_msgs;
 
-pub mod ctxfull {
-    use anyhow::Context;
-
-    pub fn get_msgs(
-        client: &reqwest::blocking::Client,
-        get_msgs_query: &crate::req::GetMsgs,
-    ) -> anyhow::Result<Vec<crate::model::ChatMsg>> {
-        super::get_msgs(client, get_msgs_query)
-            .with_context(|| "Failed to get chat messages.")
-    }
-    pub fn post_msg(
-        client: &reqwest::blocking::Client,
-        post_msg_query: &crate::req::PostMsg,
-    ) -> anyhow::Result<crate::model::ChatMsg> {
-        super::post_msg(client, post_msg_query).with_context(|| {
-            "Failed to post user-provided chat message."
-        })
-    }
-}
+pub mod ctxfull;
 
 use anyhow::{anyhow, Context};
 use serde::de::DeserializeOwned;
 use std::io::Read;
-
-pub fn get_msgs(
-    client: &reqwest::blocking::Client,
-    get_msgs_query: &crate::req::GetMsgs,
-) -> anyhow::Result<Vec<crate::model::ChatMsg>> {
-    let resp = client
-        .get("http://localhost:8080/v1/msg")
-        .query(get_msgs_query)
-        .send();
-    interpret_resp(resp)
-}
-pub fn post_msg(
-    client: &reqwest::blocking::Client,
-    post_msg_query: &crate::req::PostMsg,
-) -> anyhow::Result<crate::model::ChatMsg> {
-    let resp = client
-        .post("http://localhost:8080/v1/msg")
-        .query(post_msg_query)
-        .send();
-    interpret_resp(resp)
-}
 
 fn interpret_resp<D>(
     resp: Result<reqwest::blocking::Response, reqwest::Error>,

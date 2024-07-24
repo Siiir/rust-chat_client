@@ -1,18 +1,17 @@
 use serde::Serialize;
 
-pub mod factory{
-    use super::PostMsg;
-    use derive_more as dm;
+pub mod factory;
 
-    #[derive(dm::Constructor)]
-    pub struct MsgPoster{
-        name: String,
-    }
-    impl MsgPoster{
-        pub fn craft(&self, content: String) -> PostMsg{
-            PostMsg { author: self.name.clone(), content }
-        }
-    }
+pub fn post_msg(
+    client: &reqwest::blocking::Client,
+    post_msg_query: &crate::req::PostMsg,
+) -> anyhow::Result<crate::model::ChatMsg> {
+    let url = format!("http://{}/v1/msg", crate::app::cfg().server_addr);
+    let resp = client
+        .post(url)
+        .query(post_msg_query)
+        .send();
+    crate::req::interpret_resp(resp)
 }
 
 #[derive(derive_more::Constructor, Debug, Serialize)]

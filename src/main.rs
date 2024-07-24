@@ -1,11 +1,8 @@
-use chat_client::req::GetMsgs;
 use reqwest::blocking::Client;
 
 fn main() -> anyhow::Result<()> {
     // Inits – RO objects
-    chat_client::init::all();
-    let cli_args: chat_client::cli::Args = clap::Parser::parse();
-    let get_msgs_query: GetMsgs = (&cli_args).into();
+    let (cli_args, get_msgs_query) = chat_client::init::all();
     // Inits – app state
     let client = Client::new();
 
@@ -25,3 +22,4 @@ fn main() -> anyhow::Result<()> {
         &chat_client::MsgPoster::new(cli_args.nickname),
     )
 }
+

@@ -1,5 +1,17 @@
 use serde::Serialize;
 
+pub fn get_msgs(
+    client: &reqwest::blocking::Client,
+    get_msgs_query: &crate::req::GetMsgs,
+) -> anyhow::Result<Vec<crate::model::ChatMsg>> {
+    let url = format!("http://{}/v1/msg", crate::app::cfg().server_addr);
+    let resp = client
+        .get(url)
+        .query(get_msgs_query)
+        .send();
+    crate::req::interpret_resp(resp)
+}
+
 /// <How much & where to> move the `from_id` cursor relatively to the recent read?
 pub const UNREAD_MSG_OFFSET: i64 = -5;
 
