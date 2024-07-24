@@ -1,5 +1,7 @@
 use std::time::{self, Duration};
 
+use anyhow::Context;
+
 pub const PINGING_INTERVAL: Duration = Duration::from_secs(1);
 
 pub fn pull_msgs(
@@ -23,16 +25,25 @@ pub fn start_msg_fetching_thread(
 
             // Update `future_msg_id` dependants
             future_msg_id.map(|future_msg_id| {
-                crate::pa::write::future_msg_id_throwing_ctx_err(future_msg_id).unwrap();
+                if let Err(err) = crate::pa::write::future_msg_id_throwing_ctx_err(future_msg_id)
+                    .context("Failed to permanently update app state."){
+                    tracing::warn!("Your reading cursor position might not be preserved due to:\n{err}")
+                }
                 get_msgs_query.set_from_id(Some(future_msg_id));
             });
             // Perform the query
-            match crate::req::ctxfull::get_msgs(&client, &get_msgs_query) {
+            match crate::req::ctxfull::get_msgs(
+                &client,
+                &get_msgs_query,
+            ) {
                 Ok(msgs) => {
-                    crate::ui::stdstreams::print_msgs(msgs.iter());
+                    crate::ui::stdstreams::print_msgs(
+                        msgs.iter(),
+                    );
                     // Update [`future_msg_id`]
-                    msgs.last()
-                        .map(|last_msg| future_msg_id = Some(last_msg.id() + 1));
+                    msgs.last().map(|last_msg| {
+                        future_msg_id = Some(last_msg.id() + 1)
+                    });
                 }
                 Err(err) => tracing::error!("{err:?}\n"),
             }
@@ -42,10 +53,14 @@ pub fn start_msg_fetching_thread(
     })
 }
 
-pub fn sleep_untill_ping_interval_ends(ping_start: time::Instant) {
+pub fn sleep_untill_ping_interval_ends(
+    ping_start: time::Instant,
+) {
     let working_time: Duration = ping_start.elapsed();
     // Nap as a prize for hard work in short time (shorter than [`PINGING_INTERVAL`])
-    if let Some(deserved_nap) = PINGING_INTERVAL.checked_sub(working_time) {
+    if let Some(deserved_nap) =
+        PINGING_INTERVAL.checked_sub(working_time)
+    {
         std::thread::sleep(deserved_nap);
     }
 }

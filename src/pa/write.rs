@@ -8,7 +8,7 @@ pub fn default_future_msg_id_throwing_ctx_err() -> anyhow::Result<()> {
     future_msg_id_throwing_ctx_err(DEAFULT_FUTURE_MSG_ID)
 }
 pub fn future_msg_id_throwing_ctx_err(new_val: crate::MsgId) -> anyhow::Result<()> {
-    future_msg_id(new_val).context("Failed to write `future message id` with {new_val}.")
+    future_msg_id(new_val).context("Failed to overwrite `future message id` with {new_val}.")
 }
 #[allow(dead_code)] // future use
 fn default_future_msg_id() -> io::Result<()> {
