@@ -4,12 +4,31 @@ pub use post_msg::PostMsg;
 pub mod post_msg;
 
 pub use get_msgs::GetMsgs;
-use serde::de::DeserializeOwned;
 pub mod get_msgs;
 
-use std::io::Read;
+pub mod ctxfull {
+    use anyhow::Context;
+
+    pub fn get_msgs(
+        client: &reqwest::blocking::Client,
+        get_msgs_query: &crate::req::GetMsgs,
+    ) -> anyhow::Result<Vec<crate::model::ChatMsg>> {
+        super::get_msgs(client, get_msgs_query)
+            .with_context(|| "Failed to get chat messages.")
+    }
+    pub fn post_msg(
+        client: &reqwest::blocking::Client,
+        post_msg_query: &crate::req::PostMsg,
+    ) -> anyhow::Result<crate::model::ChatMsg> {
+        super::post_msg(client, post_msg_query).with_context(|| {
+            "Failed to post user-provided chat message."
+        })
+    }
+}
 
 use anyhow::{anyhow, Context};
+use serde::de::DeserializeOwned;
+use std::io::Read;
 
 pub fn get_msgs(
     client: &reqwest::blocking::Client,
@@ -21,34 +40,15 @@ pub fn get_msgs(
         .send();
     interpret_resp(resp)
 }
-pub fn get_msgs_with_ctx_err(
-    client: &reqwest::blocking::Client,
-    get_msgs_query: &crate::req::GetMsgs,
-) -> anyhow::Result<Vec<crate::model::ChatMsg>> {
-    get_msgs(client, get_msgs_query)
-        .with_context(|| "Failed to get chat messages.")
-}
-
 pub fn post_msg(
     client: &reqwest::blocking::Client,
     post_msg_query: &crate::req::PostMsg,
-) -> reqwest::Result<reqwest::blocking::Response> {
-    client
+) -> anyhow::Result<crate::model::ChatMsg> {
+    let resp = client
         .post("http://localhost:8080/v1/msg")
         .query(post_msg_query)
-        .send()
-}
-pub fn post_msg_with_ctx_err(
-    client: &reqwest::blocking::Client,
-    post_msg_query: &crate::req::PostMsg,
-) -> anyhow::Result<crate::model::ChatMsg> {
-    (|| -> anyhow::Result<crate::model::ChatMsg> {
-        let resp = post_msg(client, post_msg_query);
-        interpret_resp(resp)
-    })()
-    .with_context(|| {
-        "Failed to post user-provided chat message."
-    })
+        .send();
+    interpret_resp(resp)
 }
 
 fn interpret_resp<D>(

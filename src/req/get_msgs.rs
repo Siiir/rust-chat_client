@@ -1,5 +1,8 @@
 use serde::Serialize;
 
+/// <How much & where to> move the `from_id` cursor relatively to the recent read?
+pub const UNREAD_MSG_OFFSET: i64 = -5;
+
 #[derive(Default, derive_more::Constructor, Debug, Serialize)]
 pub struct GetMsgs {
     from_id: Option<i64>,
@@ -50,7 +53,7 @@ impl From<&crate::cli::Args> for GetMsgs {
         Self::new(
             Some(from_id.unwrap_or_else(|| {
                 let int = crate::pa::read::future_msg_id();
-                int - 4
+                int + UNREAD_MSG_OFFSET
             })),
             to_id.clone(),
             from_time.clone(),

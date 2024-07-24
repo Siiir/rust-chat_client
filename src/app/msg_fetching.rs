@@ -7,7 +7,7 @@ pub fn pull_msgs(
     get_msgs_query: crate::req::GetMsgs,
 ) -> Result<Vec<crate::model::ChatMsg>, anyhow::Error> {
     let messages: Vec<crate::model::ChatMsg> =
-        crate::req::get_msgs_with_ctx_err(client, &get_msgs_query)?;
+        crate::req::ctxfull::get_msgs(client, &get_msgs_query)?;
     crate::ui::stdstreams::print_msgs(messages.iter());
     Ok(messages)
 }
@@ -27,7 +27,7 @@ pub fn start_msg_fetching_thread(
                 get_msgs_query.set_from_id(Some(future_msg_id));
             });
             // Perform the query
-            match crate::req::get_msgs_with_ctx_err(&client, &get_msgs_query) {
+            match crate::req::ctxfull::get_msgs(&client, &get_msgs_query) {
                 Ok(msgs) => {
                     crate::ui::stdstreams::print_msgs(msgs.iter());
                     // Update [`future_msg_id`]

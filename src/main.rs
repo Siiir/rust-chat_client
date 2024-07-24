@@ -12,7 +12,8 @@ fn main() -> anyhow::Result<()> {
     // Fetching requested messages as the first automatic client action.
     let future_msg_id = chat_client::app::pull_msgs(&client, get_msgs_query)?
         .last()
-        .map(chat_client::model::ChatMsg::id);
+        .map(chat_client::model::ChatMsg::id)
+        .map(|last_msg_id| last_msg_id + 1);
 
     // Starting message featching deamon
     if cli_args.to_id.is_none() {

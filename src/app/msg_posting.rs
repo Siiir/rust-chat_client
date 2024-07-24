@@ -2,7 +2,7 @@ pub fn run_loop(client: &crate::ReqClient, msg_poster: &crate::MsgPoster) -> ! {
     let mut msg_content = String::new();
     loop {
         std::io::stdin().read_line(&mut msg_content).unwrap();
-        match crate::req::post_msg_with_ctx_err(
+        match crate::req::ctxfull::post_msg(
             &client,
             &msg_poster.craft(msg_content.trim_end().to_owned()),
         ) {
